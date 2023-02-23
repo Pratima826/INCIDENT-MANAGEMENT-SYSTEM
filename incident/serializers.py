@@ -39,14 +39,25 @@ class UserSerializers(serializers.ModelSerializer):
             'updated_date',
         )
 class IncidentDetailsSerializer(serializers.ModelSerializer):
+    reporter_name = SerializerMethodField()
     class Meta:
-        models = User
+        model = IncidentDetails
         fields = (
             'id',
             'incident_number',
             'reporter_name',
             'reported_date',
-            'priority','incident_status',
+            'incident_details',
+            'priority',
+            'incident_status',
             'created_at',
             'updated_at'
         )
+
+    def  get_reporter_name(self,obj):
+        first_name=obj.reporter_name.first_name
+        last_name = obj.reporter_name.last_name
+        name=f"{first_name} {last_name}"
+       
+        return name
+

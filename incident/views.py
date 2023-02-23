@@ -8,6 +8,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
+import random
+import datetime
 
 # Create your views here.
 
@@ -51,4 +53,48 @@ class GetAllUserView(APIView):
     def get(self,request):
         user = User.objects.all()
         serializer = UserSerializers(user, many=True)
+        return Response(serializer.data)
+    
+
+class IncidentCreateView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        data = request.data
+        priority = data.get('priority')
+        incident_details = data.get('incident_details')
+        incident_status = data.get('incident_status')
+        now = datetime.datetime.now()
+        year = now.year
+        num = random.randint(11111,99999)
+        incident_number = f"RMG-{num}{year}"
+
+        payload = {
+            "incident_number":incident_number,
+            "reported_date":now,
+            "reporter_name":user.id,
+            "priority":priority,
+            "incident_details":incident_details,
+            "incident_status":incident_status,
+        }
+
+        serializer = IncidentDetailsSerializer(data=payload)
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            return Response({"msg":"Payload is not right"})
+        return Response({
+                'status':"success",
+                'message':"incident created successfully",
+            },status=status.HTTP_201_CREATED)
+
+class GetAllIncidentDetailsView(APIView):
+    permission_classes=(IsAuthenticated,)
+    '''
+        Get All Incident Details
+    '''
+    def get(self,request):
+        incident_obj = IncidentDetails.objects.all()
+        serializer = IncidentDetailsSerializer(incident_obj, many=True)
         return Response(serializer.data)

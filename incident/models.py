@@ -39,7 +39,7 @@ class User(AbstractBaseUser,PermissionsMixin):
         ordering = ["-id"]
     
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.first_name}"
 
 class IncidentDetails(models.Model):
     PRIORITY_CHOICES=(
@@ -56,6 +56,7 @@ class IncidentDetails(models.Model):
     incident_number = models.CharField(max_length=50)
     reporter_name = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     reported_date = models.DateTimeField()
+    incident_details = models.TextField()
     priority = models.CharField(max_length=100,choices=PRIORITY_CHOICES,default='----')
     incident_status = models.CharField(max_length=100,choices=STATUS_CHOICES,default='Open')
     created_at = models.DateTimeField(auto_now_add=True)
